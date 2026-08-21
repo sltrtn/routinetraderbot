@@ -28,12 +28,11 @@ python bot.py
 The intraday engine monitors the NSE F&O universe. The list is stored in `data/fo_stocks.json`. Update it monthly or when contract changes occur. If you find a working NSE F&O lot-size CSV endpoint, set `NSE_FO_LOT_SIZE_URL` in `.env`.
 
 ## Deployment (Oracle Cloud)
-1. Create Always Free ARM VM (Ubuntu 24.04).
-2. Clone/copy repo to `/home/ubuntu/trading-bot`.
-3. Install deps and create `.env`.
-4. Copy `systemd/trading-bot.service` to `/etc/systemd/system/`.
-5. `systemctl enable --now trading-bot`
-6. Watch Telegram heartbeat every 30 min.
+1. Create Always Free ARM VM (Ubuntu 24.04) — see `docs/oracle-setup.md`.
+2. Run `./scripts/deploy-oracle.sh ubuntu@<VM_IP> <key>` from local.
+3. Copy `.env` to the VM, restart service.
+4. Watchdog (`scripts/watchdog.sh`) auto-restarts on crash; install via cron.
+5. Watch Telegram heartbeat every 30 min.
 
 ## Secrets
 Required in `.env`:

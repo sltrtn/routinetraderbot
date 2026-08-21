@@ -33,13 +33,17 @@ cp .env.example .env
 python bot.py
 ```
 
-## Deploy
+## Deploy (Oracle Cloud Always Free VM)
+
+Create an Ubuntu 24.04 ARM VM in the Oracle console, then:
 
 ```bash
-sudo cp systemd/trading-bot.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable --now trading-bot
+./scripts/deploy-oracle.sh ubuntu@<VM_IP> ~/.ssh/id_rsa
+scp -i ~/.ssh/id_rsa .env ubuntu@<VM_IP>:/home/ubuntu/routinetraderbot/.env
+ssh -i ~/.ssh/id_rsa ubuntu@<VM_IP> sudo systemctl restart trading-bot
 ```
+
+See `docs/oracle-setup.md` for the full guide.
 
 ## Disclaimer
 

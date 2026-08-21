@@ -28,6 +28,11 @@ See `handoff.md` for full details.
 ## Watchlist
 NSE F&O universe is in `data/fo_stocks.json`. Update monthly.
 
+## Cloud deployment
+- Deploy: `./scripts/deploy-oracle.sh ubuntu@VM_IP ~/.ssh/id_rsa`
+- Guide: `docs/oracle-setup.md`
+- Watchdog: `scripts/watchdog.sh` (cron every minute)
+
 ## Common commands
 ```bash
 source .venv/bin/activate
