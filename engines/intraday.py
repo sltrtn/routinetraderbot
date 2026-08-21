@@ -14,6 +14,7 @@ from config import settings, watchlist
 from core.database import Database
 from core.scheduler import TZ_INFO, get_current_window
 from core.state import BotState
+from engines import broker_recos
 from evidence import corroboration, dedup
 from sources import bse, google_news, nse, rss
 from sources.common import NewsItem
@@ -194,5 +195,10 @@ async def run(db: Database, state: BotState) -> None:
                 await _process_batch(session, db, state, watchlist_symbols, items)
             except Exception:
                 logger.exception("Intraday iteration failed")
+
+            try:
+                await broker_recos.run(db)
+            except Exception:
+                logger.exception("Broker reco engine failed")
 
             await asyncio.sleep(settings.INTRADAY_POLL_INTERVAL)

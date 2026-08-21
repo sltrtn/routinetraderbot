@@ -108,5 +108,24 @@ async def send_evening_wrap(filings: str) -> Optional[int]:
     return await send_message(_format_evening_wrap(filings))
 
 
+def _format_broker_reco(symbol: str, action: str, target: Optional[float], broker: str,
+                        headline: str, news_backing: int, url: str) -> str:
+    target_text = f"Target: Rs {target:,.0f}\n" if target else ""
+    return (
+        f"📈 <b>BROKER RECO</b>\n"
+        f"<b>{symbol}</b> — {action} by {broker}\n"
+        f"{target_text}"
+        f"News backing: {news_backing} recent item(s)\n\n"
+        f"<i>{headline}</i>\n"
+        f"<a href='{url}'>Read more</a>"
+        f"{DISCLAIMER}"
+    )
+
+
+async def send_broker_reco(symbol: str, action: str, target: Optional[float], broker: str,
+                           headline: str, news_backing: int, url: str) -> Optional[int]:
+    return await send_message(_format_broker_reco(symbol, action, target, broker, headline, news_backing, url))
+
+
 async def send_heartbeat() -> Optional[int]:
     return await send_message("💓 Bot heartbeat: market monitor is running.")

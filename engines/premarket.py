@@ -10,6 +10,7 @@ from ai import gemini_client
 from alerts import telegram
 from config import settings
 from core.database import Database
+from engines import broker_recos
 from sources import bse, ipo_gmp, nse
 from sources.common import NewsItem
 from sources.yfinance_client import get_global_cues
@@ -50,6 +51,12 @@ async def run(db: Database) -> None:
     events_text = "\n".join(event_lines) if event_lines else "No major overnight filings."
 
     await telegram.send_morning_brief(cues_text, events_text)
+
+    # Broker recommendations (morning research calls).
+    try:
+        await broker_recos.run(db)
+    except Exception:
+        logger.exception("Broker reco engine failed in pre-market")
 
     # IPO GMP and verdicts.
     async with aiohttp.ClientSession() as session:

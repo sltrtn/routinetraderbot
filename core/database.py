@@ -114,6 +114,22 @@ CREATE TABLE IF NOT EXISTS market_calendar (
     is_trading INTEGER NOT NULL,
     description TEXT
 );
+
+CREATE TABLE IF NOT EXISTS broker_recos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    hash TEXT UNIQUE NOT NULL,
+    symbol TEXT NOT NULL,
+    company_name TEXT,
+    action TEXT NOT NULL,
+    target REAL,
+    broker TEXT NOT NULL,
+    source TEXT NOT NULL,
+    url TEXT,
+    published_at TEXT,
+    headline TEXT,
+    alerted INTEGER DEFAULT 0,
+    created_at TEXT NOT NULL
+);
 """
 
 
@@ -244,3 +260,36 @@ class Database:
             async with db.execute(sql, params) as cursor:
                 rows = await cursor.fetchall()
                 return [dict(row) for row in rows]
+
+    async def insert_broker_reco(self, reco: Dict[str, Any]) -> bool:
+        now = datetime.now().isoformat()
+        try:
+            async with aiosqlite.connect(self.db_path) as db:
+                await db.execute(
+                    """
+                    INSERT INTO broker_recos (hash, symbol, company_name, action, target, broker, source, url, published_at, headline, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        reco["hash"], reco["symbol"], reco.get("company_name"), reco["action"],
+                        reco.get("target"), reco["broker"], reco["source"], reco.get("url"),
+                        reco.get("published_at"), reco.get("headline"), now,
+                    ),
+                )
+                await db.commit()
+                return True
+        except aiosqlite.IntegrityError:
+            return False
+
+    async def has_recent_news_for_symbol(self, symbol: str, days: int = 7) -> List[Dict[str, Any]]:
+        """Return recent news items for a symbol."""
+        since = (datetime.now() - timedelta(days=days)).isoformat()
+        return await self.fetch(
+            """
+            SELECT * FROM news_items
+            WHERE headline LIKE ? AND fetched_at > ?
+            ORDER BY fetched_at DESC
+            LIMIT 5
+            """,
+            (f"%{symbol}%", since),
+        )
