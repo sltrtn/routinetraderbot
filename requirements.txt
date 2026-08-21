@@ -1,0 +1,13 @@
+aiohttp
+aiosqlite
+feedparser
+python-telegram-bot
+google-genai
+yfinance
+requests
+python-dotenv
+pytz
+beautifulsoup4
+pdfplumber
+lxml
+pandas
